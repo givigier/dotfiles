@@ -36,11 +36,20 @@ CONFIG="$HOME/.config"
 link "$DOTFILES/zsh/zshrc"            "$HOME/.zshrc"
 link "$DOTFILES/starship/starship.toml" "$CONFIG/starship.toml"
 
-# fzf-tab is not in Homebrew; vendor it via git clone.
+# fzf-tab is not in Homebrew; vendor it via git, pinned to an immutable commit
+# (the SHA of tag v1.3.0) so a compromised upstream can't run code in our shell.
 FZF_TAB_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/fzf-tab"
+FZF_TAB_REV="d7e0234614dbe5369fdd760907d12c0e05a4dccc" # v1.3.0
 if [ ! -d "$FZF_TAB_DIR" ]; then
-  git clone --depth 1 https://github.com/Aloxaf/fzf-tab "$FZF_TAB_DIR" \
-    &>/dev/null && success "Installed fzf-tab" || warn "Could not clone fzf-tab"
+  if git init -q "$FZF_TAB_DIR" \
+    && git -C "$FZF_TAB_DIR" remote add origin https://github.com/Aloxaf/fzf-tab \
+    && git -C "$FZF_TAB_DIR" fetch -q --depth 1 origin "$FZF_TAB_REV" \
+    && git -C "$FZF_TAB_DIR" checkout -q FETCH_HEAD; then
+    success "Installed fzf-tab (v1.3.0)"
+  else
+    warn "Could not fetch fzf-tab"
+    rm -rf "$FZF_TAB_DIR"
+  fi
 fi
 
 # Git
