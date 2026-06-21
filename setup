@@ -61,6 +61,9 @@ if [ -f "$HOME/.gitconfig" ] && [ ! -L "$HOME/.gitconfig" ]; then
   warn "    mv ~/.gitconfig ~/.gitconfig.bak"
 fi
 
+# SSH (OrbStack include)
+link "$DOTFILES/ssh/config" "$HOME/.ssh/config"
+
 # mise
 link "$DOTFILES/mise/config.toml" "$CONFIG/mise/config.toml"
 

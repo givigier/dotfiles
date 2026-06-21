@@ -1,0 +1,3 @@
+# ~/.ssh/config — symlinked from the dotfiles repo.
+
+Include ~/.orbstack/ssh/config

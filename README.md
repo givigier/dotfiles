@@ -65,6 +65,7 @@ A few things require a GUI toggle or an admin prompt and can't live in a script:
 | `zsh/` | `zshrc`, aliases, functions, abbreviations |
 | `starship/` | Prompt |
 | `git/` | Git config + global gitignore |
+| `ssh/` | SSH client config (OrbStack include) |
 | `mise/` | Default language runtimes (Ruby, Node…) |
 | `ghostty/` | Terminal emulator |
 | `tmux/` | Terminal multiplexer |
