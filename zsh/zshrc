@@ -1,0 +1,85 @@
+# ~/.zshrc — symlinked from the dotfiles repo.
+# Keep this lean; put aliases/functions in the sourced files below.
+
+# --- Resolve the dotfiles directory (this file is a symlink into the repo) ---
+__dotfiles_self="${${(%):-%x}:A}"
+DOTFILES="${__dotfiles_self:h:h}"
+[[ -d "$DOTFILES" ]] || DOTFILES="$HOME/Projects/dotfiles"
+export DOTFILES
+unset __dotfiles_self
+
+# --- Homebrew ---
+if [[ -x /opt/homebrew/bin/brew ]]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [[ -x /usr/local/bin/brew ]]; then
+  eval "$(/usr/local/bin/brew shellenv)"
+fi
+BREW_PREFIX="${HOMEBREW_PREFIX:-/opt/homebrew}"
+
+# --- PATH ---
+export PATH="$HOME/.local/bin:$HOME/.bin:$PATH"
+# Rust: the rustup formula is keg-only; toolchain proxies live in ~/.cargo/bin
+[[ -d "$BREW_PREFIX/opt/rustup/bin" ]] && export PATH="$BREW_PREFIX/opt/rustup/bin:$PATH"
+[[ -d "$HOME/.cargo/bin" ]] && export PATH="$HOME/.cargo/bin:$PATH"
+
+# --- Environment ---
+export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
+export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
+export EDITOR="vim"
+command -v cursor &>/dev/null && export EDITOR="cursor --wait"
+export VISUAL="$EDITOR"
+export LANG="en_US.UTF-8"
+
+# --- History ---
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=50000
+SAVEHIST=50000
+setopt SHARE_HISTORY HIST_IGNORE_ALL_DUPS HIST_IGNORE_SPACE \
+  HIST_REDUCE_BLANKS INC_APPEND_HISTORY EXTENDED_HISTORY
+
+# --- Shell options ---
+setopt AUTO_CD AUTO_PUSHD PUSHD_IGNORE_DUPS PUSHD_SILENT INTERACTIVE_COMMENTS
+
+# --- Completion ---
+autoload -Uz compinit
+compinit -d "$XDG_CACHE_HOME/zcompdump"
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'   # case-insensitive
+zstyle ':completion:*' menu no                              # required by fzf-tab
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+
+# --- Plugins (order matters) ---
+# fzf-tab: replace completion menu with an fzf picker (cloned by ./setup)
+source "$XDG_DATA_HOME/fzf-tab/fzf-tab.plugin.zsh" 2>/dev/null
+
+# fish-like autosuggestions
+source "$BREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh" 2>/dev/null
+
+# fish-like abbreviations — store them straight in the versioned repo file,
+# so `abbr add` from any shell updates the dotfiles directly.
+export ABBR_USER_ABBREVIATIONS_FILE="$DOTFILES/zsh/abbreviations"
+source "$BREW_PREFIX/share/zsh-abbr/zsh-abbr.zsh" 2>/dev/null
+
+# syntax highlighting MUST be sourced last
+source "$BREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" 2>/dev/null
+
+# --- Tool integrations ---
+command -v mise &>/dev/null    && eval "$(mise activate zsh)"
+command -v direnv &>/dev/null  && eval "$(direnv hook zsh)"
+command -v zoxide &>/dev/null  && eval "$(zoxide init zsh)"
+command -v fzf &>/dev/null      && source <(fzf --zsh) 2>/dev/null
+command -v starship &>/dev/null && eval "$(starship init zsh)"
+
+# --- Aliases & functions ---
+for __f in \
+  "$DOTFILES"/zsh/git-functions.zsh \
+  "$DOTFILES"/zsh/functions.zsh \
+  "$DOTFILES"/zsh/aliases.zsh \
+  "$DOTFILES"/zsh/git.zsh \
+  "$DOTFILES"/zsh/docker.zsh; do
+  [[ -r "$__f" ]] && source "$__f"
+done
+unset __f
+
+# --- Local, machine-specific overrides (never committed) ---
+[[ -r "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"

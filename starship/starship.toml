@@ -1,0 +1,125 @@
+# Starship prompt — https://starship.rs/config
+# Requires a Nerd Font (installed via Brewfile: font-jetbrains-mono-nerd-font).
+
+add_newline = true
+command_timeout = 1000
+
+format = """
+$directory\
+$git_branch\
+$git_status\
+$ruby\
+$nodejs\
+$golang\
+$rust\
+$python\
+$java\
+$kotlin\
+$c\
+$cpp\
+$php\
+$elixir\
+$lua\
+$swift\
+$dart\
+$zig\
+$haskell\
+$scala\
+$package\
+$cmd_duration\
+$line_break\
+$character"""
+
+[character]
+success_symbol = "[❯](bold green)"
+error_symbol = "[❯](bold red)"
+vim_symbol = "[](bold yellow)"
+
+[directory]
+style = "bold cyan"
+truncation_length = 3
+truncate_to_repo = true
+read_only = " 󰌾"
+
+[git_branch]
+symbol = " "
+style = "bold purple"
+
+[git_status]
+style = "bold yellow"
+
+[cmd_duration]
+min_time = 2000
+format = "[ took $duration]($style)"
+style = "italic dimmed white"
+
+[ruby]
+symbol = "ruby "
+style = "bold red"
+
+[nodejs]
+symbol = "node "
+style = "bold green"
+
+[golang]
+symbol = "go "
+style = "bold cyan"
+
+[rust]
+symbol = "rust "
+style = "bold red"
+
+[python]
+symbol = "python "
+style = "bold yellow"
+
+[java]
+symbol = "java "
+style = "bold red"
+
+[kotlin]
+symbol = "kotlin "
+style = "bold purple"
+
+[c]
+symbol = "c "
+style = "bold blue"
+
+[cpp]
+symbol = "c++ "
+style = "bold blue"
+
+[php]
+symbol = "php "
+style = "bold blue"
+
+[elixir]
+symbol = "elixir "
+style = "bold purple"
+
+[lua]
+symbol = "lua "
+style = "bold blue"
+
+[swift]
+symbol = "swift "
+style = "bold red"
+
+[dart]
+symbol = "dart "
+style = "bold blue"
+
+[zig]
+symbol = "zig "
+style = "bold yellow"
+
+[haskell]
+symbol = "haskell "
+style = "bold purple"
+
+[scala]
+symbol = "scala "
+style = "bold red"
+
+[package]
+disabled = true

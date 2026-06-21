@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+#
+# install — bootstrap a fresh macOS machine from zero.
+#
+# Usage on a brand new Mac:
+#   git clone https://github.com/givigier/dotfiles.git ~/Projects/dotfiles
+#   ~/Projects/dotfiles/install
+#
+# It is safe to run multiple times (idempotent).
+
+set -euo pipefail
+
+REPO_URL="https://github.com/givigier/dotfiles.git"
+DOTFILES="${DOTFILES:-$HOME/Projects/dotfiles}"
+
+info() { printf "\033[38;5;252m  %s\033[0m\n" "$*"; }
+success() { printf "\033[32m\033[1m  ✓ %s\033[0m\n" "$*"; }
+warn() { printf "\033[38;5;137m  ! %s\033[0m\n" "$*"; }
+
+if [ "$(uname -s)" != "Darwin" ]; then
+  warn "This bootstrap targets macOS only."
+  exit 1
+fi
+
+# 1. Xcode Command Line Tools (gives us git, compilers, etc.)
+if ! xcode-select -p &>/dev/null; then
+  info "Installing Xcode Command Line Tools (a dialog will pop up)…"
+  xcode-select --install || true
+  until xcode-select -p &>/dev/null; do
+    sleep 5
+  done
+  success "Xcode Command Line Tools installed"
+fi
+
+# 2. Homebrew
+if ! command -v brew &>/dev/null; then
+  info "Installing Homebrew…"
+  NONINTERACTIVE=1 /bin/bash -c \
+    "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+fi
+# Make brew available in this shell (Apple Silicon path).
+if [ -x /opt/homebrew/bin/brew ]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [ -x /usr/local/bin/brew ]; then
+  eval "$(/usr/local/bin/brew shellenv)"
+fi
+
+# 3. Ensure ~/Projects exists, then clone the dotfiles repo into it.
+mkdir -p "$(dirname "$DOTFILES")"
+if [ ! -d "$DOTFILES/.git" ]; then
+  info "Cloning dotfiles into $DOTFILES…"
+  git clone "$REPO_URL" "$DOTFILES"
+fi
+cd "$DOTFILES"
+
+# 4. Install everything declared in the Brewfile.
+info "Installing apps and CLIs via Homebrew bundle (this can take a while)…"
+brew bundle --file="$DOTFILES/Brewfile"
+success "Brew bundle complete"
+
+# 5. Symlink all the configs into place.
+"$DOTFILES/setup"
+
+# 6. Install language runtimes managed by mise.
+if command -v mise &>/dev/null; then
+  info "Installing runtimes with mise…"
+  mise install || warn "mise install reported issues; check 'mise doctor'"
+fi
+
+# 7. Rust: rustup is installed via the Brewfile (keg-only). Install a toolchain.
+RUSTUP_BIN="$(brew --prefix rustup 2>/dev/null)/bin/rustup"
+if [ -x "$RUSTUP_BIN" ]; then
+  info "Setting up the Rust toolchain via rustup…"
+  "$RUSTUP_BIN" default stable &>/dev/null || warn "rustup: could not set default toolchain"
+  "$RUSTUP_BIN" component add rust-analyzer clippy rustfmt rust-src &>/dev/null || true
+fi
+
+success "All set! Open a new terminal."
+warn "1Password is not auto-installed — install it from https://1password.com/downloads"
+info "Tip: run './macos/set-defaults.sh' to apply macOS system preferences."

@@ -1,0 +1,6 @@
+# macOS
+.DS_Store
+
+# Local, machine-specific overrides (never tracked)
+*.local
+.zshrc.local

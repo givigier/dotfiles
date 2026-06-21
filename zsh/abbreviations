@@ -1,0 +1,18 @@
+# zsh-abbr abbreviations — auto-loaded by zsh-abbr.
+# Each line is an `abbr` command. `abbr add` from any shell appends here.
+# Type the key + <Space> to expand it inline before running.
+
+# NOTE: git aliases now come from prezto (see zsh/git.zsh), so git
+# abbreviations were removed to avoid name clashes (e.g. prezto's `gs` = stash).
+
+# --- tools ---
+abbr lg='lazygit'
+abbr v='$EDITOR'
+abbr t='tmux'
+abbr ta='tmux attach'
+
+# --- mise / ruby / node ---
+abbr m='mise'
+abbr be='bundle exec'
+abbr rs='bin/rails server'
+abbr rc='bin/rails console'

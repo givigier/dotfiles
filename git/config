@@ -1,0 +1,71 @@
+[user]
+	name = Gabriel Givigier
+	email = gabriel@givigier.com
+	signingkey = ~/.ssh/id_rsa.pub
+
+[init]
+	defaultBranch = main
+
+[core]
+	excludesfile = ~/.config/git/ignore
+	editor = vim
+	pager = less -FRX
+	autocrlf = input
+	precomposeunicode = true
+
+[column]
+	ui = auto
+
+[branch]
+	sort = -committerdate
+
+[tag]
+	sort = version:refname
+
+[pull]
+	ff = only
+
+[push]
+	autoSetupRemote = true
+	default = current
+	followTags = true
+
+[fetch]
+	prune = true
+	pruneTags = true
+
+[rebase]
+	autoStash = true
+	autoSquash = true
+	updateRefs = true
+
+[merge]
+	conflictStyle = zdiff3
+
+[diff]
+	algorithm = histogram
+	colorMoved = default
+	renames = true
+
+[rerere]
+	enabled = true
+
+[help]
+	autocorrect = prompt
+
+[color]
+	ui = auto
+
+# ----------------------------------------------------------------------------
+# Commit signing via 1Password (SSH).  Disabled by default so a fresh machine
+# never fails to commit.  To enable:
+#   1. In 1Password, turn on the SSH agent and add your key.
+#   2. Add the key as a *signing* key in GitHub settings.
+#   3. Uncomment the blocks below and set your public key.
+# ----------------------------------------------------------------------------
+[gpg]
+	format = ssh
+[gpg "ssh"]
+	program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
+[commit]
+	gpgsign = true

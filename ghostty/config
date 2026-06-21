@@ -1,0 +1,38 @@
+# Ghostty — https://ghostty.org/docs/config
+# Reload in-app with Cmd+Shift+, (or restart).
+
+# Appearance
+theme = Catppuccin Mocha
+font-family = "JetBrainsMono Nerd Font"
+font-size = 12
+font-thicken = true
+
+# Window
+window-padding-x = 10
+window-padding-y = 8
+window-save-state = always
+macos-titlebar-style = tabs
+background-opacity = 0.98
+background-blur-radius = 20
+
+# Cursor
+cursor-style = block
+cursor-style-blink = false
+mouse-hide-while-typing = true
+
+# Shell
+shell-integration = zsh
+shell-integration-features = cursor,sudo,title
+
+# Quality of life
+copy-on-select = clipboard
+confirm-close-surface = false
+
+# Keybindings — split navigation (Super+H mirrors the macOS Hide remap trick)
+keybind = super+shift+enter=new_split:right
+keybind = super+d=new_split:right
+keybind = super+shift+d=new_split:down
+keybind = super+h=goto_split:left
+keybind = super+l=goto_split:right
+keybind = super+k=goto_split:top
+keybind = super+j=goto_split:bottom

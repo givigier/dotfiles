@@ -1,0 +1,34 @@
+# Global gitignore — applies to every repo.
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
+
+# Editors / IDEs
+.idea/
+*.swp
+*.swo
+*~
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# Direnv
+.envrc.local
+.direnv/
+
+# Env / secrets
+.env
+.env.local
+*.local
+
+# Logs & misc
+*.log
+.ruby-lsp/
+node_modules/
+.DS_Store

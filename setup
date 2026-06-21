@@ -1,0 +1,91 @@
+#!/usr/bin/env bash
+#
+# setup — symlink every config into place. Idempotent.
+#
+# Run it any time after editing the repo:
+#   ~/Projects/dotfiles/setup
+
+set -euo pipefail
+
+DOTFILES="${DOTFILES:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}"
+
+info() { printf "\033[38;5;252m  %s\033[0m\n" "$*"; }
+success() { printf "\033[32m\033[1m  ✓ %s\033[0m\n" "$*"; }
+warn() { printf "\033[38;5;137m  ! %s\033[0m\n" "$*"; }
+
+# link <source> <target>
+# Creates target's parent dir and symlinks source -> target.
+# Skips real (non-symlink) files so we never clobber something by accident.
+link() {
+  local src="$1" dst="$2"
+  mkdir -p "$(dirname "$dst")"
+  if [ -L "$dst" ]; then
+    ln -sfn "$src" "$dst"
+  elif [ -e "$dst" ]; then
+    warn "Skipping $dst — a real file exists (move it aside to link)."
+    return
+  else
+    ln -s "$src" "$dst"
+    success "Linked $(basename "$dst")"
+  fi
+}
+
+CONFIG="$HOME/.config"
+
+# Shell
+link "$DOTFILES/zsh/zshrc"            "$HOME/.zshrc"
+link "$DOTFILES/starship/starship.toml" "$CONFIG/starship.toml"
+
+# fzf-tab is not in Homebrew; vendor it via git clone.
+FZF_TAB_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/fzf-tab"
+if [ ! -d "$FZF_TAB_DIR" ]; then
+  git clone --depth 1 https://github.com/Aloxaf/fzf-tab "$FZF_TAB_DIR" \
+    &>/dev/null && success "Installed fzf-tab" || warn "Could not clone fzf-tab"
+fi
+
+# Git
+link "$DOTFILES/git/config"  "$CONFIG/git/config"
+link "$DOTFILES/git/ignore"  "$CONFIG/git/ignore"
+# A real ~/.gitconfig takes precedence over ~/.config/git/config — warn if present.
+if [ -f "$HOME/.gitconfig" ] && [ ! -L "$HOME/.gitconfig" ]; then
+  warn "~/.gitconfig exists and overrides the versioned config. Move it aside:"
+  warn "    mv ~/.gitconfig ~/.gitconfig.bak"
+fi
+
+# mise
+link "$DOTFILES/mise/config.toml" "$CONFIG/mise/config.toml"
+
+# Ghostty
+link "$DOTFILES/ghostty/config" "$CONFIG/ghostty/config"
+
+# tmux
+link "$DOTFILES/tmux/tmux.conf" "$CONFIG/tmux/tmux.conf"
+
+# Personal scripts
+link "$DOTFILES/bin" "$HOME/.bin"
+
+# Cursor
+CURSOR_USER="$HOME/Library/Application Support/Cursor/User"
+link "$DOTFILES/cursor/settings.json" "$CURSOR_USER/settings.json"
+
+# AI assistants (global guidance)
+link "$DOTFILES/ai/AGENTS.md" "$HOME/.claude/CLAUDE.md"
+
+# Editor-agnostic config
+link "$DOTFILES/.editorconfig" "$HOME/.editorconfig"
+
+# Restore Cursor extensions if the CLI is available.
+if command -v cursor &>/dev/null && [ -f "$DOTFILES/cursor/extensions.txt" ]; then
+  while read -r ext; do
+    [ -z "$ext" ] && continue
+    cursor --install-extension "$ext" &>/dev/null || warn "Could not install $ext"
+  done < "$DOTFILES/cursor/extensions.txt"
+fi
+
+# Make zsh the default shell (it already is on modern macOS, but just in case).
+if [ "${SHELL##*/}" != "zsh" ] && command -v zsh &>/dev/null; then
+  info "Setting zsh as the default shell (may ask for your password)…"
+  chsh -s "$(command -v zsh)" || warn "Could not change shell."
+fi
+
+success "Symlinks done."
