@@ -1,3 +1,17 @@
 # ~/.ssh/config — symlinked from the dotfiles repo.
 
+# Machine-specific / secret hosts (git-ignored, optional). Kept first so local
+# overrides win — SSH uses the first value it finds for each option.
+Include ~/.ssh/config.local
+
+Host *
+  # Authenticate with keys served by the 1Password SSH agent (1Password also
+  # signs commits — see git/config). Keys are created/stored in 1Password.
+  IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+  # Don't expose the agent to remote hosts unless a host opts in explicitly.
+  ForwardAgent no
+  # Keep long-lived sessions alive through idle NAT/firewall timeouts.
+  ServerAliveInterval 60
+  ServerAliveCountMax 3
+
 Include ~/.orbstack/ssh/config

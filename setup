@@ -61,8 +61,12 @@ if [ -f "$HOME/.gitconfig" ] && [ ! -L "$HOME/.gitconfig" ]; then
   warn "    mv ~/.gitconfig ~/.gitconfig.bak"
 fi
 
-# SSH (OrbStack include)
+# SSH (auth + commit signing come from the 1Password SSH agent)
 link "$DOTFILES/ssh/config" "$HOME/.ssh/config"
+OP_AGENT="$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+if [ ! -S "$OP_AGENT" ]; then
+  warn "1Password SSH agent not found — enable it in 1Password → Settings → Developer."
+fi
 
 # mise
 link "$DOTFILES/mise/config.toml" "$CONFIG/mise/config.toml"

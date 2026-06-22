@@ -65,7 +65,7 @@ A few things require a GUI toggle or an admin prompt and can't live in a script:
 | `zsh/` | `zshrc`, aliases, functions, abbreviations |
 | `starship/` | Prompt |
 | `git/` | Git config + global gitignore |
-| `ssh/` | SSH client config (OrbStack include) |
+| `ssh/` | SSH client config |
 | `mise/` | Default language runtimes (Ruby, Node…) |
 | `ghostty/` | Terminal emulator |
 | `tmux/` | Terminal multiplexer |
@@ -103,10 +103,10 @@ scheme differs from common habits — e.g. `gs` = `git stash`, while status is
 Secrets (SSH keys, tokens, credentials) are **never** committed. This repo is
 public. Handle them manually on each machine:
 
-- **SSH keys**: generate per machine (`ssh-keygen -t ed25519`) and add the public
-  key to GitHub. Or store/serve keys via the 1Password SSH agent.
-- **Git commit signing**: SSH signing via 1Password is pre-wired but commented
-  out in [`git/config`](git/config) — uncomment and add your public key to enable.
+- **Auth & signing**: both come from the 1Password SSH agent — auth via
+  `IdentityAgent` in [`ssh/config`](ssh/config), commit signing via `op-ssh-sign`
+  in [`git/config`](git/config). Create your keys in 1Password, enable the SSH
+  agent (Settings → Developer), and add the key to GitHub.
 - **Machine-specific config**: put anything local/secret in `~/.zshrc.local`
   (sourced automatically, git-ignored).
 
